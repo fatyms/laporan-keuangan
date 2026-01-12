@@ -182,6 +182,14 @@ async function loadData() {
   saldoEl.textContent = 'Rp ' + (pemasukan - pengeluaran).toLocaleString();
 }
 
+btnFilter.onclick = async () => {
+  if (!filterBulan.value) return;
+  const { data } = await getTransaksiByBulan(filterBulan.value);
+  renderTable(data);
+};
+
+btnReset.onclick = loadData;
+  
 window.hapus = async (id) => {
   await deleteTransaksi(id);
   loadData();
@@ -212,4 +220,5 @@ loadData();
 
 </body>
 </html>
+
 
