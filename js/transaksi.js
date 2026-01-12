@@ -23,6 +23,18 @@ export async function deleteTransaksi(id) {
   return await supabase.from('transaksi').delete().eq('id', id);
 }
 
+btnFilter.addEventListener('click', async () => {
+  if (!filterBulan.value) {
+    alert('Pilih bulan terlebih dahulu');
+    return;
+  }
+
+  const { data } = await getTransaksiByBulan(filterBulan.value);
+  renderTable(data);
+});
+
+btnReset.addEventListener('click', loadData);
+
 export async function getTransaksiByBulan(bulan) {
   const start = `${bulan}-01`;
   const end = new Date(bulan + '-01');
