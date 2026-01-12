@@ -39,7 +39,7 @@
 
   <select id="kategori" class="border p-2 rounded md:col-span-2" required></select>
 
-  <input type="number" id="nominal" placeholder="Nominal" class="border p-2 rounded md:col-span-1" required />
+  <input type="text" id="nominal" placeholder="Nominal" class="border p-2 rounded md:col-span-1" required />
   <input type="number" id="qty" placeholder="Qty" value="1" min="1" class="border p-2 rounded md:col-span-1" required />
 
   <input type="text" id="totalView" placeholder="Total" class="border p-2 rounded md:col-span-2 bg-gray-100 font-semibold" readonly />
@@ -121,8 +121,43 @@ const btnSubmit = document.getElementById('btnSubmit');
 
 let editId = null;
 
-// Hitung Total Otomatis
+// Fungsi mengubah angka ke format titik (1.000)
+function formatRupiah(angka) {
+  let number_string = angka.replace(/[^,\d]/g, '').toString(),
+    split = number_string.split(','),
+    sisa = split[0].length % 3,
+    rupiah = split[0].substr(0, sisa),
+    ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+  if (ribuan) {
+    let separator = sisa ? '.' : '';
+    rupiah += separator + ribuan.join('.');
+  }
+
+  return split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+}
+
+// Fungsi untuk mengambil angka murni (menghilangkan titik) sebelum simpan ke DB
+function cleanNominal(string) {
+  return Number(string.replace(/\./g, '')) || 0;
+}
+  
+// Memformat tampilan input saat diketik
+nominalInput.addEventListener('keyup', function(e) {
+  this.value = formatRupiah(this.value);
+  hitungTotal(); // Panggil hitung total agar otomatis terupdate
+});
+
+// Update fungsi hitungTotal agar bisa membaca format titik
 function hitungTotal() {
+  const nominal = cleanNominal(nominalInput.value); // Bersihkan titik dulu
+  const qty = Number(qtyInput.value) || 0;
+  const total = nominal * qty;
+  totalView.value = total ? 'Rp ' + total.toLocaleString('id-ID') : '';
+}
+  
+// Hitung Total Otomatis
+/* function hitungTotal() {
   const nominal = Number(nominalInput.value) || 0;
   const qty = Number(qtyInput.value) || 0;
   const total = nominal * qty;
@@ -130,7 +165,8 @@ function hitungTotal() {
 }
 nominalInput.addEventListener('input', hitungTotal);
 qtyInput.addEventListener('input', hitungTotal);
-
+*/
+  
 // Load Kategori
 function loadKategori() {
   const kategoriSelect = document.getElementById('kategori');
@@ -222,7 +258,7 @@ window.closeModal = () => {
 };  
 
 // Global Actions
-window.editTransaksi = (item) => {
+  window.editTransaksi = (item) => {
   editId = item.id;
 
   // Pindahkan form ke dalam variabel string untuk ditampilkan di modal
@@ -238,7 +274,7 @@ window.editTransaksi = (item) => {
   document.getElementById('catatan').value = item.catatan || '';
   document.getElementById('jenis').value = item.jenis;
   document.getElementById('kategori').value = item.kategori;
-  document.getElementById('nominal').value = item.nominal;
+  document.getElementById('nominal').value = formatRupiah(item.nominal.toString());;
   document.getElementById('qty').value = item.qty;
   
   hitungTotal();
@@ -261,7 +297,7 @@ formTransaksi.onsubmit = async (e) => {
     catatan: document.getElementById('catatan').value,
     jenis: document.getElementById('jenis').value,
     kategori: document.getElementById('kategori').value,
-    nominal: Number(nominalInput.value),
+    nominal: cleanNominal(nominalInput.value),
     qty: Number(qtyInput.value)
   };
 
@@ -356,6 +392,7 @@ window.addEventListener('load', () => {
   
 </body>
 </html>
+
 
 
 
