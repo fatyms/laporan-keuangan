@@ -207,18 +207,44 @@ async function loadData() {
   }
 }
 
+// Fungsi untuk membuka modal
+window.showModal = (contentHtml) => {
+  const modal = document.getElementById('modalOverlay');
+  const modalContent = document.getElementById('modalContent');
+  modalContent.innerHTML = contentHtml;
+  modal.classList.remove('hidden'); // Menampilkan modal
+};
+
+// Fungsi untuk menutup modal
+window.closeModal = () => {
+  const modal = document.getElementById('modalOverlay');
+  modal.classList.add('hidden'); // Menyembunyikan modal
+};  
+
 // Global Actions
 window.editTransaksi = (item) => {
   editId = item.id;
+
+  // Pindahkan form ke dalam variabel string untuk ditampilkan di modal
+  // Atau lebih mudah: tampilkan form yang sudah ada di tengah
+  const overlay = document.getElementById('modalOverlay');
+  const form = document.getElementById('formTransaksi');
+
+  // Memasukkan form ke dalam modal (opsional: atau buat form khusus modal)
+  document.getElementById('modalContent').appendChild(form);
+
+  // Isi data ke form
   document.getElementById('tanggal').value = item.tanggal;
   document.getElementById('catatan').value = item.catatan || '';
   document.getElementById('jenis').value = item.jenis;
   document.getElementById('kategori').value = item.kategori;
   document.getElementById('nominal').value = item.nominal;
   document.getElementById('qty').value = item.qty;
+  
   hitungTotal();
   btnSubmit.textContent = 'Update Transaksi';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  overlay.classList.remove('hidden');
+  // window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
 window.hapus = async (id) => {
@@ -330,5 +356,6 @@ window.addEventListener('load', () => {
   
 </body>
 </html>
+
 
 
