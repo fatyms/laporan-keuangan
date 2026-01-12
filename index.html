@@ -317,6 +317,18 @@ window.addEventListener('load', () => {
   loadData();
 });
 </script>
+  <div id="modalOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6 relative">
+      <button onclick="closeModal()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600">
+        ✕
+      </button>
+    
+      <div id="modalContent">
+    </div>
+  </div>
+</div>
+  
 </body>
 </html>
+
 
