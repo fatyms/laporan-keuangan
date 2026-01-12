@@ -37,21 +37,30 @@
 
 <!-- ================= FORM ================= -->
 <form id="formTransaksi"
-  class="grid grid-cols-1 md:grid-cols-7 gap-3 bg-white p-4 rounded shadow mb-6">
+  class="grid grid-cols-1 md:grid-cols-12 gap-3 bg-white p-4 rounded shadow mb-6">
 
-  <input type="date" id="tanggal" required class="border p-2 rounded" />
-  <input type="text" id="catatan" placeholder="Catatan" class="border p-2 rounded" />
+  <input type="date" id="tanggal" class="border p-2 rounded md:col-span-2" required />
+  <input type="text" id="catatan" placeholder="Catatan" class="border p-2 rounded md:col-span-4" />
 
-  <select id="jenis" class="border p-2 rounded" required>
+  <select id="jenis" class="border p-2 rounded md:col-span-2" required>
     <option value="pemasukan">Pemasukan</option>
     <option value="pengeluaran">Pengeluaran</option>
   </select>
 
   <!-- KATEGORI (DINAMIS) -->
-  <select id="kategori" class="border p-2 rounded" required></select>
+  <select id="kategori" "border p-2 rounded md:col-span-2" required></select>
 
-  <input type="number" id="nominal" placeholder="Nominal" class="border p-2 rounded" required />
-  <input type="number" id="qty" value="1" min="1" class="border p-2 rounded" required />
+  <input type="number" id="nominal" placeholder="Nominal" class="border p-2 rounded md:col-span-1" required />
+  <input type="number" id="qty" placeholder="Qty" value="1" min="1" class="border p-2 rounded md:col-span-1 w-20" required />
+
+  <!-- TOTAL (READ ONLY) -->
+  <input type="text" id="totalView" placeholder="Total" class="border p-2 rounded md:col-span-2 bg-gray-100 font-semibold"
+  readonly />
+
+  <button id="btnSubmit"
+    class="md:col-span-12 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded">
+    Simpan
+  </button>
 
   <button id="btnSubmit"
     class="md:col-span-7 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded">
@@ -327,6 +336,7 @@ loadData();
 
 </body>
 </html>
+
 
 
 
