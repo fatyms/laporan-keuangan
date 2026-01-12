@@ -238,11 +238,7 @@ function renderRekap(data) {
 }
 
 /* ================= ACTION ================= */
-window.hapus = async (id) => {
-  await deleteTransaksi(id);
-  loadData();
-};
-
+  
 window.editTransaksi = (item) => {
   editId = item.id;
   tanggal.value = item.tanggal;
@@ -331,6 +327,7 @@ loadData();
 
 </body>
 </html>
+
 
 
 
