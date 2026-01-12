@@ -1,5 +1,9 @@
 import { supabase } from './supabase.js';
 
+const filterBulan = document.getElementById('filterBulan');
+const btnFilter = document.getElementById('btnFilter');
+const btnReset = document.getElementById('btnReset');
+
 export async function getTransaksi(kategori = '') {
   let query = supabase
     .from('transaksi')
