@@ -277,10 +277,11 @@ formTransaksi.onsubmit = async (e) => {
   }
 
   if (result.error) {
-    alert('Gagal menyimpan data!');
-    console.error(result.error);
-    return;
+  alert('Gagal menyimpan data:\n' + result.error.message);
+  console.error('SUPABASE ERROR:', result.error);
+  return;
   }
+
 
   formTransaksi.reset();
   loadData();
@@ -326,5 +327,6 @@ loadData();
 
 </body>
 </html>
+
 
 
