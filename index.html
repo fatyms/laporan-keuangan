@@ -1,13 +1,4 @@
 <!DOCTYPE html>
-<option value="pengeluaran">Pengeluaran</option>
-</select>
-
-
-<select id="kategori" class="border p-2 rounded">
-<option>Umum</option>
-<option>Event</option>
-<option>Marketing dan promosi</option>
-<option>Gaji dan kesejahteraan karyawan</option>
 <option>Transportasi</option>
 <option>Pembelian Aset</option>
 </select>
@@ -51,7 +42,15 @@ const { data } = await getTransaksi();
 tbody.innerHTML = '';
 
 
+let pemasukan = 0;
+let pengeluaran = 0;
+
+
 data.forEach(item => {
+if (item.jenis === 'pemasukan') pemasukan += item.total;
+if (item.jenis === 'pengeluaran') pengeluaran += item.total;
+
+
 tbody.innerHTML += `
 <tr class="border-t">
 <td class="p-2">${item.tanggal}</td>
@@ -64,6 +63,11 @@ tbody.innerHTML += `
 </td>
 </tr>`;
 });
+
+
+document.getElementById('totalPemasukan').innerText = 'Rp ' + pemasukan.toLocaleString();
+document.getElementById('totalPengeluaran').innerText = 'Rp ' + pengeluaran.toLocaleString();
+document.getElementById('saldo').innerText = 'Rp ' + (pemasukan - pengeluaran).toLocaleString();
 }
 
 
