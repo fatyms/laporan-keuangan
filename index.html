@@ -133,6 +133,7 @@
 <script type="module">
 import {
   getTransaksi,
+  getTransaksiByTanggal,
   getTransaksiByBulan,
   addTransaksi,
   updateTransaksi,
@@ -356,6 +357,35 @@ btnFilter.onclick = async () => {
   renderTable(data);
   renderRekap(data);
 };
+  
+  btnFilterTanggal.onclick = async () => {
+  if (!startDate.value || !endDate.value) {
+    alert('Lengkapi tanggal mulai dan akhir');
+    return;
+  }
+
+  if (startDate.value > endDate.value) {
+    alert('Tanggal mulai tidak boleh lebih besar dari tanggal akhir');
+    return;
+  }
+
+  const { data, error } = await getTransaksiByTanggal(
+    startDate.value,
+    endDate.value
+  );
+
+  if (error) {
+    console.error(error);
+    alert('Gagal mengambil data');
+    return;
+  }
+
+  renderTable(data);
+  renderRekap(data);
+
+  infoPeriode.textContent =
+    `Periode: ${startDate.value} s/d ${endDate.value}`;
+};
 
 btnReset.onclick = loadData;
 
@@ -374,6 +404,7 @@ loadData();
 
 </body>
 </html>
+
 
 
 
