@@ -4,14 +4,8 @@
   <meta charset="UTF-8" />
   <title>Laporan Keuangan</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Export Excel -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-
-  <!-- Export PDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 
@@ -19,7 +13,6 @@
 
 <h1 class="text-2xl font-bold mb-6">📊 Laporan Keuangan</h1>
 
-<!-- ================= DASHBOARD ================= -->
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
   <div class="bg-green-100 p-4 rounded shadow">
     <p class="text-sm">Pemasukan</p>
@@ -35,404 +28,279 @@
   </div>
 </div>
 
-<!-- ================= FORM ================= -->
-<form id="formTransaksi"
-  class="grid grid-cols-1 md:grid-cols-12 gap-3 bg-white p-4 rounded shadow mb-6">
-
+<form id="formTransaksi" class="grid grid-cols-1 md:grid-cols-12 gap-3 bg-white p-4 rounded shadow mb-6">
   <input type="date" id="tanggal" class="border p-2 rounded md:col-span-2" required />
   <input type="text" id="catatan" placeholder="Catatan" class="border p-2 rounded md:col-span-4" />
-
+  
   <select id="jenis" class="border p-2 rounded md:col-span-2" required>
     <option value="pemasukan">Pemasukan</option>
     <option value="pengeluaran">Pengeluaran</option>
   </select>
 
-  <!-- KATEGORI (DINAMIS) -->
-  <select id="kategori" "border p-2 rounded md:col-span-2" required></select>
+  <select id="kategori" class="border p-2 rounded md:col-span-2" required></select>
 
   <input type="number" id="nominal" placeholder="Nominal" class="border p-2 rounded md:col-span-1" required />
-  <input type="number" id="qty" placeholder="Qty" value="1" min="1" class="border p-2 rounded md:col-span-1 w-20" required />
+  <input type="number" id="qty" placeholder="Qty" value="1" min="1" class="border p-2 rounded md:col-span-1" required />
 
-  <!-- TOTAL (READ ONLY) -->
-  <input type="text" id="totalView" placeholder="Total" class="border p-2 rounded md:col-span-2 bg-gray-100 font-semibold"
-  readonly />
+  <input type="text" id="totalView" placeholder="Total" class="border p-2 rounded md:col-span-2 bg-gray-100 font-semibold" readonly />
 
-  <button id="btnSubmit"
-    class="md:col-span-7 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded">
-    Simpan
+  <button id="btnSubmit" type="submit" class="md:col-span-12 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded">
+    Simpan Transaksi
   </button>
 </form>
 
-<!-- ================= FILTER & EXPORT ================= -->
-<div class="flex flex-wrap gap-2 mb-4">
-  <input type="month" id="filterBulan" class="border p-2 rounded" />
-
-  <!-- 
-  <button id="btnFilter" class="bg-blue-600 text-white px-4 rounded">
-    Filter
-  </button>
-
-  <button id="btnReset" class="bg-gray-500 text-white px-4 rounded">
-    Reset
-  </button>
-  -->
-  <button onclick="exportExcel()" class="bg-green-600 text-white px-4 rounded">
-    Excel
-  </button>
-
-  <button onclick="exportPDF()" class="bg-red-600 text-white px-4 rounded">
-    PDF
-  </button>
-  <div class="flex flex-wrap gap-2 mb-4 items-end">
-  <div>
-    <label class="text-xs text-gray-500">Dari Tanggal</label>
-    <input type="date" id="startDate" class="border p-2 rounded w-full">
+<div class="bg-white p-4 rounded shadow mb-4">
+  <div class="flex flex-wrap gap-4 items-end">
+    <div>
+      <label class="block text-xs text-gray-500 mb-1">Dari Tanggal</label>
+      <input type="date" id="startDate" class="border p-2 rounded w-full">
+    </div>
+    <div>
+      <label class="block text-xs text-gray-500 mb-1">Sampai Tanggal</label>
+      <input type="date" id="endDate" class="border p-2 rounded w-full">
+    </div>
+    <button id="btnFilterTanggal" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded">Tampilkan</button>
+    <button id="btnReset" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded">Reset</button>
+    
+    <div class="flex gap-2 ml-auto">
+        <button onclick="exportExcel()" class="bg-green-600 text-white px-4 py-2 rounded">Export Excel</button>
+        <button onclick="exportPDF()" class="bg-red-600 text-white px-4 py-2 rounded">Export PDF</button>
+    </div>
   </div>
-
-  <div>
-    <label class="text-xs text-gray-500">Sampai Tanggal</label>
-    <input type="date" id="endDate" class="border p-2 rounded w-full">
-  </div>
-
-  <button id="btnFilterTanggal"
-    class="bg-blue-600 text-white px-4 py-2 rounded">
-    Tampilkan
-  </button>
-
-  <button id="btnReset"
-    class="bg-gray-500 text-white px-4 py-2 rounded">
-    Reset
-  </button>
+  <p id="infoPeriode" class="text-sm text-blue-600 mt-2 font-medium"></p>
 </div>
 
-</div>
-
-<!-- ================= TABLE ================= -->
 <div class="bg-white rounded shadow overflow-x-auto">
-<table class="min-w-full text-sm">
-  <thead class="bg-gray-200">
-    <tr>
-      <th class="p-2 text-left">Tanggal</th>
-      <th class="p-2 text-left">Catatan</th>
-      <th class="p-2">Jenis</th>
-      <th class="p-2">Kategori</th>
-      <th class="p-2 text-right">Nominal</th>
-      <th class="p-2 text-right">Qty</th>
-      <th class="p-2 text-right">Total</th>
-      <th class="p-2">Aksi</th>
-    </tr>
-  </thead>
-  <tbody id="tbody"></tbody>
-</table>
+  <table class="min-w-full text-sm">
+    <thead class="bg-gray-200">
+      <tr>
+        <th class="p-3 text-left">Tanggal</th>
+        <th class="p-3 text-left">Catatan</th>
+        <th class="p-3 text-center">Jenis</th>
+        <th class="p-3 text-left">Kategori</th>
+        <th class="p-3 text-right">Nominal</th>
+        <th class="p-3 text-center">Qty</th>
+        <th class="p-3 text-right">Total</th>
+        <th class="p-3 text-center">Aksi</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
 </div>
 
-<!-- ================= REKAP ================= -->
 <div id="rekapKategori" class="bg-white p-4 mt-6 rounded shadow"></div>
 
-<!-- ================= SCRIPT ================= -->
 <script type="module">
 import {
   getTransaksi,
   getTransaksiByTanggal,
-  getTransaksiByBulan,
   addTransaksi,
   updateTransaksi,
   deleteTransaksi
 } from './js/transaksi.js';
 
-/* ================= KATEGORI ================= */
 const KATEGORI_LIST = [
-  'Marketing dan promosi',
-  'Jasa photography',
-  'Cetak media promosi',
-  'Event',
-  'Bazzar dan pameran',
-  'Kemasan',
-  'Beban angkut penjualan',
-  'Labeling',
-  'Visual Merchandise',
-  'Sponsorship',
-  'Survey',
-  'Gaji dan kesejahteraan karyawan',
-  'Pengembangan Karyawan',
-  'Seragam Karyawan',
-  'Listrik air dan telepon',
-  'Sewa',
-  'Perlengkapan dan peralatan kantor',
-  'Transportasi',
-  'Paket dan ekspedisi',
-  'Perjalanan Dinas',
-  'Beban reparasi dan pemeliharaan aset tetap',
-  'Pajak dan retribusi',
-  'Relasi, customer dan VIP',
-  'Konsolidasi',
-  'Umum',
-  'Iuran',
-  'Sumbangan',
-  'CSR',
-  'Jasa konsultasi',
-  'Inovasi',
-  'Asuransi',
-  'Administrasi',
-  'Other',
-  'Pembelian Aset',
-  'Cicilan Aset',
-  'Cicilan Bank',
-  'Piutang Karyawan',
-  'Piutang Boko',
-  'Piutang Jiwa Jogja',
-  'Piutang Cafe',
-  'Modal'
+  'Marketing dan promosi', 'Jasa photography', 'Cetak media promosi', 'Event', 'Bazzar dan pameran', 
+  'Kemasan', 'Beban angkut penjualan', 'Labeling', 'Visual Merchandise', 'Sponsorship', 
+  'Survey', 'Gaji dan kesejahteraan karyawan', 'Pengembangan Karyawan', 'Seragam Karyawan', 
+  'Listrik air dan telepon', 'Sewa', 'Perlengkapan dan peralatan kantor', 'Transportasi', 
+  'Paket dan ekspedisi', 'Perjalanan Dinas', 'Beban reparasi dan pemeliharaan aset tetap', 
+  'Pajak dan retribusi', 'Relasi, customer dan VIP', 'Konsolidasi', 'Umum', 'Iuran', 
+  'Sumbangan', 'CSR', 'Jasa konsultasi', 'Inovasi', 'Asuransi', 'Administrasi', 
+  'Other', 'Pembelian Aset', 'Cicilan Aset', 'Cicilan Bank', 'Piutang Karyawan', 
+  'Piutang Boko', 'Piutang Jiwa Jogja', 'Piutang Cafe', 'Modal'
 ];
 
 const nominalInput = document.getElementById('nominal');
 const qtyInput = document.getElementById('qty');
 const totalView = document.getElementById('totalView');
+const formTransaksi = document.getElementById('formTransaksi');
+const tbody = document.getElementById('tbody');
+const infoPeriode = document.getElementById('infoPeriode');
+const btnSubmit = document.getElementById('btnSubmit');
 
+let editId = null;
+
+// Hitung Total Otomatis
 function hitungTotal() {
   const nominal = Number(nominalInput.value) || 0;
   const qty = Number(qtyInput.value) || 0;
   const total = nominal * qty;
-
-  totalView.value = total
-    ? 'Rp ' + total.toLocaleString()
-    : '';
+  totalView.value = total ? 'Rp ' + total.toLocaleString('id-ID') : '';
 }
-
 nominalInput.addEventListener('input', hitungTotal);
 qtyInput.addEventListener('input', hitungTotal);
-  
-const kategoriSelect = document.getElementById('kategori');
+
+// Load Kategori
 function loadKategori() {
+  const kategoriSelect = document.getElementById('kategori');
   kategoriSelect.innerHTML = '<option value="">-- Pilih Kategori --</option>';
-  KATEGORI_LIST.forEach(k => {
+  KATEGORI_LIST.sort().forEach(k => {
     const opt = document.createElement('option');
     opt.value = k;
     opt.textContent = k;
     kategoriSelect.appendChild(opt);
   });
 }
-loadKategori();
 
-/* ================= ELEMENT ================= */
-const tbody = document.getElementById('tbody');
-const pemasukanEl = document.getElementById('pemasukan');
-const pengeluaranEl = document.getElementById('pengeluaran');
-const saldoEl = document.getElementById('saldo');
-const btnSubmit = document.getElementById('btnSubmit');
-
-let editId = null;
-
-/* ================= LOAD ================= */
-async function loadData() {
-  const { data } = await getTransaksi();
-  renderTable(data);
-  renderRekap(data);
-}
-
-/* ================= RENDER ================= */
+// Render Table
 function renderTable(data) {
   let pemasukan = 0;
   let pengeluaran = 0;
   tbody.innerHTML = '';
 
   data.forEach(item => {
-    if (item.jenis === 'pemasukan') pemasukan += item.total;
-    else pengeluaran += item.total;
+    const itemTotal = item.nominal * item.qty;
+    if (item.jenis === 'pemasukan') pemasukan += itemTotal;
+    else pengeluaran += itemTotal;
 
     tbody.innerHTML += `
-      <tr class="border-t">
-        <td class="p-2">${item.tanggal}</td>
-        <td class="p-2">${item.catatan ?? ''}</td>
-        <td class="p-2 text-center">${item.jenis}</td>
-        <td class="p-2">${item.kategori}</td>
-        <td class="p-2 text-right">Rp ${item.nominal.toLocaleString()}</td>
-        <td class="p-2 text-right">${item.qty}</td>
-        <td class="p-2 text-right font-semibold">Rp ${item.total.toLocaleString()}</td>
-        <td class="p-2 text-center">
-          <button onclick='editTransaksi(${JSON.stringify(item)})'
-            class="text-blue-600">Edit</button>
-          |
-          <button onclick="hapus('${item.id}')"
-            class="text-red-600">Hapus</button>
+      <tr class="border-t hover:bg-gray-50">
+        <td class="p-3">${item.tanggal}</td>
+        <td class="p-3">${item.catatan || '-'}</td>
+        <td class="p-3 text-center">
+            <span class="${item.jenis === 'pemasukan' ? 'text-green-600' : 'text-red-600'} capitalize">
+                ${item.jenis}
+            </span>
+        </td>
+        <td class="p-3">${item.kategori}</td>
+        <td class="p-3 text-right">Rp ${item.nominal.toLocaleString('id-ID')}</td>
+        <td class="p-3 text-center">${item.qty}</td>
+        <td class="p-3 text-right font-bold">Rp ${itemTotal.toLocaleString('id-ID')}</td>
+        <td class="p-3 text-center">
+          <button onclick='editTransaksi(${JSON.stringify(item)})' class="text-blue-600 hover:underline mr-2">Edit</button>
+          <button onclick="hapus('${item.id}')" class="text-red-600 hover:underline">Hapus</button>
         </td>
       </tr>`;
   });
 
-  pemasukanEl.textContent = 'Rp ' + pemasukan.toLocaleString();
-  pengeluaranEl.textContent = 'Rp ' + pengeluaran.toLocaleString();
-  saldoEl.textContent = 'Rp ' + (pemasukan - pengeluaran).toLocaleString();
+  document.getElementById('pemasukan').textContent = 'Rp ' + pemasukan.toLocaleString('id-ID');
+  document.getElementById('pengeluaran').textContent = 'Rp ' + pengeluaran.toLocaleString('id-ID');
+  document.getElementById('saldo').textContent = 'Rp ' + (pemasukan - pengeluaran).toLocaleString('id-ID');
 }
 
-/* ================= REKAP ================= */
 function renderRekap(data) {
   const rekap = {};
   data.forEach(i => {
-    rekap[i.kategori] = (rekap[i.kategori] || 0) + i.total;
+    const t = i.nominal * i.qty;
+    rekap[i.kategori] = (rekap[i.kategori] || 0) + t;
   });
 
   const el = document.getElementById('rekapKategori');
-  el.innerHTML = '<h3 class="font-bold mb-2">Rekap per Kategori</h3>';
-
-  for (const k in rekap) {
+  el.innerHTML = '<h3 class="font-bold mb-4 text-lg border-b pb-2">Rekap per Kategori</h3>';
+  
+  Object.keys(rekap).sort().forEach(k => {
     el.innerHTML += `
-      <div class="flex justify-between border-b py-1">
+      <div class="flex justify-between border-b py-2 text-sm">
         <span>${k}</span>
-        <span>Rp ${rekap[k].toLocaleString()}</span>
+        <span class="font-semibold">Rp ${rekap[k].toLocaleString('id-ID')}</span>
       </div>`;
+  });
+}
+
+async function loadData() {
+  const { data, error } = await getTransaksi();
+  if (error) console.error(error);
+  else {
+    renderTable(data);
+    renderRekap(data);
   }
 }
 
-/* ================= ACTION ================= */
-  
+// Global Actions
 window.editTransaksi = (item) => {
   editId = item.id;
-  tanggal.value = item.tanggal;
-  catatan.value = item.catatan ?? '';
-  jenis.value = item.jenis;
-  kategori.value = item.kategori;
-  nominal.value = item.nominal;
-  qty.value = item.qty;
-
+  document.getElementById('tanggal').value = item.tanggal;
+  document.getElementById('catatan').value = item.catatan || '';
+  document.getElementById('jenis').value = item.jenis;
+  document.getElementById('kategori').value = item.kategori;
+  document.getElementById('nominal').value = item.nominal;
+  document.getElementById('qty').value = item.qty;
   hitungTotal();
-  btnSubmit.textContent = 'Update';
+  btnSubmit.textContent = 'Update Transaksi';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+window.hapus = async (id) => {
+  if (!confirm('Hapus transaksi ini?')) return;
+  const res = await deleteTransaksi(id);
+  if (res.error) alert('Gagal menghapus');
+  else loadData();
 };
 
 formTransaksi.onsubmit = async (e) => {
   e.preventDefault();
-
-  const nominalVal = Number(nominal.value);
-  const qtyVal = Number(qty.value);
-  const total = nominalVal * qtyVal;
-  
   const payload = {
-    tanggal: tanggal.value,
-    catatan: catatan.value,
-    jenis: jenis.value,
-    kategori: kategori.value,
-    nominal: Number(nominal.value),
-    qty: Number(qty.value)
+    tanggal: document.getElementById('tanggal').value,
+    catatan: document.getElementById('catatan').value,
+    jenis: document.getElementById('jenis').value,
+    kategori: document.getElementById('kategori').value,
+    nominal: Number(nominalInput.value),
+    qty: Number(qtyInput.value)
   };
 
-  let result;
-
-  if (editId) {
-    result = await updateTransaksi(editId, payload);
-    editId = null;
-    btnSubmit.textContent = 'Simpan';
-  } else {
-    result = await addTransaksi(payload);
-  }
+  let result = editId 
+    ? await updateTransaksi(editId, payload) 
+    : await addTransaksi(payload);
 
   if (result.error) {
-  alert('Gagal menyimpan data:\n' + result.error.message);
-  console.error('SUPABASE ERROR:', result.error);
-  return;
+    alert('Error: ' + result.error.message);
+  } else {
+    formTransaksi.reset();
+    totalView.value = '';
+    editId = null;
+    btnSubmit.textContent = 'Simpan Transaksi';
+    loadData();
   }
-
-  formTransaksi.reset();
-  totalView.Value = '';  
-  loadData();
 };
 
- window.hapus = async (id) => {
-  if (!confirm('Hapus transaksi ini?')) return;
+// Filter Tanggal
+document.getElementById('btnFilterTanggal').onclick = async () => {
+  const start = document.getElementById('startDate').value;
+  const end = document.getElementById('endDate').value;
 
-  const res = await deleteTransaksi(id);
-
-  if (res.error) {
-    alert('Gagal menghapus');
-    console.error(res.error);
+  if (!start || !end) {
+    alert('Pilih rentang tanggal!');
     return;
   }
 
-  loadData();
-};
- 
-
-/* ================= FILTER ================= */
-btnFilter.onclick = async () => {
-  if (!filterBulan.value) return;
-  const { data } = await getTransaksiByBulan(filterBulan.value);
-  renderTable(data);
-  renderRekap(data);
-};
-  
-  btnFilterTanggal.onclick = async () => {
-  if (!startDate.value || !endDate.value) {
-    alert('Lengkapi tanggal mulai dan akhir');
-    return;
+  const { data, error } = await getTransaksiByTanggal(start, end);
+  if (error) alert('Gagal mengambil data');
+  else {
+    renderTable(data);
+    renderRekap(data);
+    infoPeriode.textContent = `Menampilkan data: ${start} s/d ${end}`;
   }
-
-  if (startDate.value > endDate.value) {
-    alert('Tanggal mulai tidak boleh lebih besar dari tanggal akhir');
-    return;
-  }
-
-  const { data, error } = await getTransaksiByTanggal(
-    startDate.value,
-    endDate.value
-  );
-
-  if (error) {
-    console.error(error);
-    alert('Gagal mengambil data');
-    return;
-  }
-
-  renderTable(data);
-  renderRekap(data);
-
-  infoPeriode.textContent =
-    `Periode: ${startDate.value} s/d ${endDate.value}`;
 };
 
-btnReset.onclick = loadData;
-btnReset.onclick = async () => {
-  startDate.value = '';
-  endDate.value = '';
+document.getElementById('btnReset').onclick = () => {
+  document.getElementById('startDate').value = '';
+  document.getElementById('endDate').value = '';
   infoPeriode.textContent = '';
-
-  const { data } = await getTransaksi();
-  renderTable(data);
-  renderRekap(data);
+  loadData();
 };
-  
-/* ================= EXPORT ================= */
+
+// Exports
 window.exportExcel = () => {
   const wb = XLSX.utils.table_to_book(document.querySelector('table'));
-  XLSX.writeFile(wb, 'laporan-keuangan.xlsx');
+  XLSX.writeFile(wb, `Laporan_${new Date().getTime()}.xlsx`);
 };
 
 window.exportPDF = () => {
-  html2pdf().from(document.body).save('laporan-keuangan.pdf');
+  const element = document.body;
+  html2pdf().from(element).set({
+    margin: 10,
+    filename: 'Laporan_Keuangan.pdf',
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+  }).save();
 };
 
+// Init
 window.addEventListener('load', () => {
-  const now = new Date();
-  startDate.value = new Date(now.getFullYear(), now.getMonth(), 1)
-    .toISOString().slice(0,10);
-  endDate.value = now.toISOString().slice(0,10);
+  loadKategori();
+  loadData();
 });
-  
-loadData();
 </script>
-
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
