@@ -1,6 +1,6 @@
 import { supabase } from './supabase.js';
 
-export async function getTransaksi(kategori = null) {
+export async function getTransaksi(kategori = '') {
   let query = supabase
     .from('transaksi')
     .select('*')
