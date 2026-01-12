@@ -6,11 +6,11 @@
   <title>Laporan Keuangan</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-<script>
-  const supabaseUrl = 'https://XXXX.supabase.co';
-  const supabaseKey = 'PUBLIC_ANON_KEY';
-  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-</script>  
+  <script>
+    const supabaseUrl = 'https://nrhbxuiztmafwhwhfkmz.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5yaGJ4dWl6dG1hZndod2hma216Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxODIzMzksImV4cCI6MjA4Mzc1ODMzOX0.KLz-DGdXVx2r0r02lAeYy1EL62TRwrWwalqy76l93vU';
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+  </script>  
 </head>
 <body class="bg-gray-100 min-h-screen">
   <div class="max-w-7xl mx-auto p-4">
@@ -109,44 +109,40 @@
   </div>
 
   <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbxuhA8uMP6Z9wSmT6TYhCiUsPK0HPRvUovoTIsqqopua5cqQaFgcakfZ-yLkpZVrz9_/execc';
+    
+    async function loadData(kategori = null) {
+      let query = supabase.from('transaksi').select('*').order('tanggal', { ascending: false });
 
-    async function loadData() {
-      const res = await fetch(API_URL);
-      const data = await res.json();
+      if (kategori) query = query.eq('kategori', kategori);
 
-      let pemasukan = 0;
-      let pengeluaran = 0;
-      const tbody = document.getElementById('tableBody');
-      tbody.innerHTML = '';
+      const { data } = await query;
 
-      data.forEach(item => {
-        const total = item.nominal * item.qty;
-        if (item.jenis === 'pemasukan') pemasukan += total;
-        else pengeluaran += total;
+  // render table & dashboard
+}
 
-        tbody.innerHTML += `
-          <tr class="border-t">
-            <td class="p-2">${item.tanggal}</td>
-            <td class="p-2">${item.catatan}</td>
-            <td class="p-2 text-center">${item.jenis}</td>
-            <td class="p-2">${item.kategori}</td>
-            <td class="p-2 text-right">Rp ${item.nominal.toLocaleString()}</td>
-            <td class="p-2 text-center">${item.qty}</td>
-            <td class="p-2 text-right font-semibold">Rp ${total.toLocaleString()}</td>
-            <td class="p-2 text-center">
-              <button onclick="deleteData(${item.id})" class="text-red-600">Delete</button>
-            </td>
-          </tr>`;
-      });
-
-      document.getElementById('totalPemasukan').innerText = 'Rp ' + pemasukan.toLocaleString();
-      document.getElementById('totalPengeluaran').innerText = 'Rp ' + pengeluaran.toLocaleString();
-      document.getElementById('saldo').innerText = 'Rp ' + (pemasukan - pengeluaran).toLocaleString();
-    }
 
     document.getElementById('formTransaksi').addEventListener('submit', async e => {
-      e.preventDefault();
+  e.preventDefault();
+
+  const { error } = await supabase
+    .from('transaksi')
+    .insert([{
+      tanggal: tanggal.value,
+      catatan: catatan.value,
+      jenis: jenis.value,
+      kategori: kategori.value,
+      nominal: Number(nominal.value),
+      qty: Number(qty.value)
+    }]);
+
+  if (error) {
+    alert(error.message);
+  } else {
+    e.target.reset();
+    loadData();
+  }
+});
+
 
       const payload = {
         tanggal: tanggal.value,
@@ -167,8 +163,7 @@
     });
 
     async function deleteData(id) {
-      if (!confirm('Hapus data?')) return;
-      await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+      await supabase.from('transaksi').delete().eq('id', id);
       loadData();
     }
 
@@ -176,5 +171,6 @@
   </script>
 </body>
 </html>
+
 
 
