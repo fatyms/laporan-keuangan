@@ -1,25 +1,98 @@
+<!DOCTYPE html>
+<option value="pengeluaran">Pengeluaran</option>
+</select>
+
+
+<select id="kategori" class="border p-2 rounded">
+<option>Umum</option>
+<option>Event</option>
+<option>Marketing dan promosi</option>
+<option>Gaji dan kesejahteraan karyawan</option>
+<option>Transportasi</option>
+<option>Pembelian Aset</option>
+</select>
+
+
+<input type="number" id="nominal" placeholder="Nominal" required class="border p-2 rounded" />
+<input type="number" id="qty" placeholder="Qty" value="1" required class="border p-2 rounded" />
+
+
+<button class="md:col-span-6 bg-blue-600 text-white p-2 rounded">Simpan</button>
+</form>
+
+
+<!-- TABLE -->
+<div class="bg-white rounded shadow overflow-x-auto">
+<table class="min-w-full text-sm">
+<thead class="bg-gray-200">
+<tr>
+<th class="p-2">Tanggal</th>
+<th class="p-2">Catatan</th>
+<th class="p-2">Jenis</th>
+<th class="p-2">Kategori</th>
+<th class="p-2">Total</th>
+<th class="p-2">Aksi</th>
+</tr>
+</thead>
+<tbody id="tableBody"></tbody>
+</table>
+</div>
+
+
 <script type="module">
-  import { getTransaksi, addTransaksi, deleteTransaksi } from './js/transaksi.js';
+import { getTransaksi, addTransaksi, deleteTransaksi } from './js/transaksi.js';
 
-  async function loadData() {
-    const { data } = await getTransaksi();
-    console.log(data);
-  }
 
-  document.getElementById('formTransaksi').addEventListener('submit', async e => {
-    e.preventDefault();
+const tbody = document.getElementById('tableBody');
 
-    await addTransaksi({
-      tanggal: tanggal.value,
-      catatan: catatan.value,
-      jenis: jenis.value,
-      kategori: kategori.value,
-      nominal: Number(nominal.value),
-      qty: Number(qty.value)
-    });
 
-    loadData();
-  });
+async function loadData() {
+const { data } = await getTransaksi();
+tbody.innerHTML = '';
 
-  loadData();
+
+data.forEach(item => {
+tbody.innerHTML += `
+<tr class="border-t">
+<td class="p-2">${item.tanggal}</td>
+<td class="p-2">${item.catatan}</td>
+<td class="p-2">${item.jenis}</td>
+<td class="p-2">${item.kategori}</td>
+<td class="p-2">Rp ${item.total.toLocaleString()}</td>
+<td class="p-2">
+<button onclick="hapus('${item.id}')" class="text-red-600">Hapus</button>
+</td>
+</tr>`;
+});
+}
+
+
+window.hapus = async (id) => {
+await deleteTransaksi(id);
+loadData();
+};
+
+
+document.getElementById('formTransaksi').addEventListener('submit', async e => {
+e.preventDefault();
+
+
+await addTransaksi({
+tanggal: tanggal.value,
+catatan: catatan.value,
+jenis: jenis.value,
+kategori: kategori.value,
+nominal: Number(nominal.value),
+qty: Number(qty.value)
+});
+
+
+e.target.reset();
+loadData();
+});
+
+
+loadData();
 </script>
+</body>
+</html>
