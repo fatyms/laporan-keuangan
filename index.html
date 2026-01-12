@@ -143,6 +143,7 @@ import {
   getTransaksi,
   getTransaksiByBulan,
   addTransaksi,
+  updateTransaksi,
   deleteTransaksi
 } from './js/transaksi.js';
 
@@ -157,6 +158,9 @@ const btnReset = document.getElementById('btnReset');
 
 const formTransaksi = document.getElementById('formTransaksi');
 
+let editId = null;
+
+/* ===== RENDER ===== */
 function renderTable(data) {
   let pemasukan = 0;
   let pengeluaran = 0;
@@ -178,10 +182,11 @@ function renderTable(data) {
           Rp ${item.total.toLocaleString()}
         </td>
         <td class="p-2 text-center">
+          <button onclick='edit(${JSON.stringify(item)})'
+            class="text-blue-600 hover:underline">Edit</button>
+          |
           <button onclick="hapus('${item.id}')"
-            class="text-red-600 hover:underline">
-            Hapus
-          </button>
+            class="text-red-600 hover:underline">Hapus</button>
         </td>
       </tr>
     `;
@@ -192,23 +197,34 @@ function renderTable(data) {
   saldoEl.textContent = 'Rp ' + (pemasukan - pengeluaran).toLocaleString();
 }
 
+/* ===== LOAD ===== */
 async function loadData() {
   const { data } = await getTransaksi();
   renderTable(data);
 }
 
 /* ===== FILTER BULAN ===== */
-btnFilter.addEventListener('click', async () => {
+btnFilter.onclick = async () => {
   if (!filterBulan.value) {
-    alert('Pilih bulan terlebih dahulu');
+    alert('Pilih bulan dulu');
     return;
   }
-
   const { data } = await getTransaksiByBulan(filterBulan.value);
   renderTable(data);
-});
+};
 
-btnReset.addEventListener('click', loadData);
+btnReset.onclick = loadData;
+
+/* ===== EDIT ===== */
+window.edit = (item) => {
+  editId = item.id;
+  tanggal.value = item.tanggal;
+  catatan.value = item.catatan;
+  jenis.value = item.jenis;
+  kategori.value = item.kategori;
+  nominal.value = item.nominal;
+  qty.value = item.qty;
+};
 
 /* ===== DELETE ===== */
 window.hapus = async (id) => {
@@ -216,28 +232,37 @@ window.hapus = async (id) => {
   loadData();
 };
 
-/* ===== ADD TRANSAKSI ===== */
-formTransaksi.addEventListener('submit', async (e) => {
+/* ===== SUBMIT ===== */
+formTransaksi.onsubmit = async (e) => {
   e.preventDefault();
 
-  await addTransaksi({
+  const payload = {
     tanggal: tanggal.value,
     catatan: catatan.value,
     jenis: jenis.value,
     kategori: kategori.value,
     nominal: Number(nominal.value),
     qty: Number(qty.value)
-  });
+  };
+
+  if (editId) {
+    await updateTransaksi(editId, payload);
+    editId = null;
+  } else {
+    await addTransaksi(payload);
+  }
 
   formTransaksi.reset();
   loadData();
-});
+};
 
 loadData();
 </script>
 
+
 </body>
 </html>
+
 
 
 
