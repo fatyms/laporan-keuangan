@@ -1,7 +1,7 @@
 import { supabase } from './supabase.js';
 
 /* ======================
-   GET DATA
+   GET
 ====================== */
 export async function getTransaksi() {
   return await supabase
@@ -28,7 +28,11 @@ export async function getTransaksiByBulan(bulan) {
 ====================== */
 export async function addTransaksi(data) {
   data.total = data.nominal * data.qty;
-  return await supabase.from('transaksi').insert([data]);
+
+  return await supabase
+    .from('transaksi')
+    .insert([data])
+    .select(); // 🔥 WAJIB
 }
 
 /* ======================
@@ -36,12 +40,21 @@ export async function addTransaksi(data) {
 ====================== */
 export async function updateTransaksi(id, data) {
   data.total = data.nominal * data.qty;
-  return await supabase.from('transaksi').update(data).eq('id', id);
+
+  return await supabase
+    .from('transaksi')
+    .update(data)
+    .eq('id', id)
+    .select(); // 🔥 WAJIB
 }
 
 /* ======================
    DELETE
 ====================== */
 export async function deleteTransaksi(id) {
-  return await supabase.from('transaksi').delete().eq('id', id);
+  return await supabase
+    .from('transaksi')
+    .delete()
+    .eq('id', id)
+    .select(); // 🔥 WAJIB
 }
