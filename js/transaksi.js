@@ -1,8 +1,5 @@
 import { supabase } from './supabase.js';
 
-/* ======================
-   GET
-====================== */
 export async function getTransaksi() {
   return await supabase
     .from('transaksi')
@@ -23,38 +20,20 @@ export async function getTransaksiByBulan(bulan) {
     .order('tanggal', { ascending: false });
 }
 
-/* ======================
-   ADD
-====================== */
 export async function addTransaksi(data) {
-  data.total = data.nominal * data.qty;
-
-  return await supabase
-    .from('transaksi')
-    .insert([data])
-    .select(); // 🔥 WAJIB
+  return await supabase.from('transaksi').insert([data]);
 }
 
-/* ======================
-   UPDATE
-====================== */
 export async function updateTransaksi(id, data) {
-  data.total = data.nominal * data.qty;
-
   return await supabase
     .from('transaksi')
     .update(data)
-    .eq('id', id)
-    .select(); // 🔥 WAJIB
+    .eq('id', id);
 }
 
-/* ======================
-   DELETE
-====================== */
 export async function deleteTransaksi(id) {
   return await supabase
     .from('transaksi')
     .delete()
-    .eq('id', id)
-    .select(); // 🔥 WAJIB
+    .eq('id', id);
 }
