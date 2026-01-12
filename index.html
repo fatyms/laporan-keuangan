@@ -4,163 +4,126 @@
   <meta charset="UTF-8" />
   <title>Laporan Keuangan</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Export Excel -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+  <!-- Export PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 
 <body class="bg-gray-100 p-6">
 
-<!-- HEADER -->
 <h1 class="text-2xl font-bold mb-6">📊 Laporan Keuangan</h1>
 
 <!-- DASHBOARD -->
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
   <div class="bg-green-100 p-4 rounded shadow">
-    <p class="text-sm text-green-700">Pemasukan</p>
-    <h2 id="pemasukan" class="text-xl font-bold text-green-800">Rp 0</h2>
+    <p>Pemasukan</p>
+    <h2 id="pemasukan" class="font-bold">Rp 0</h2>
   </div>
   <div class="bg-red-100 p-4 rounded shadow">
-    <p class="text-sm text-red-700">Pengeluaran</p>
-    <h2 id="pengeluaran" class="text-xl font-bold text-red-800">Rp 0</h2>
+    <p>Pengeluaran</p>
+    <h2 id="pengeluaran" class="font-bold">Rp 0</h2>
   </div>
   <div class="bg-blue-100 p-4 rounded shadow">
-    <p class="text-sm text-blue-700">Saldo</p>
-    <h2 id="saldo" class="text-xl font-bold text-blue-800">Rp 0</h2>
+    <p>Saldo</p>
+    <h2 id="saldo" class="font-bold">Rp 0</h2>
   </div>
 </div>
 
-<!-- FORM INPUT -->
+<!-- FORM -->
 <form id="formTransaksi"
   class="grid grid-cols-1 md:grid-cols-7 gap-3 bg-white p-4 rounded shadow mb-6">
 
-  <input type="date" id="tanggal"
-    class="border p-2 rounded" required />
+  <input type="date" id="tanggal" required class="border p-2 rounded">
+  <input type="text" id="catatan" placeholder="Catatan" class="border p-2 rounded">
 
-  <input type="text" id="catatan"
-    placeholder="Catatan"
-    class="border p-2 rounded" />
-
-  <select id="jenis" class="border p-2 rounded" required>
+  <select id="jenis" class="border p-2 rounded">
     <option value="pemasukan">Pemasukan</option>
     <option value="pengeluaran">Pengeluaran</option>
   </select>
 
-  <!-- KATEGORI (HARUS SAMA DENGAN DB) -->
-  <select id="kategori" class="border p-2 rounded" required>
-    <option value="">-- Pilih Kategori --</option>
-
-    <option>Marketing dan promosi</option>
-    <option>Jasa photography</option>
-    <option>Cetak media promosi</option>
-    <option>Event</option>
-    <option>Bazzar dan pameran</option>
-    <option>Kemasan</option>
-    <option>Beban angkut penjualan</option>
-    <option>Labeling</option>
-    <option>Visual Merchandise</option>
-    <option>Sponsorship</option>
-    <option>Survey</option>
-    <option>Gaji dan kesejahteraan karyawan</option>
-    <option>Pengembangan Karyawan</option>
-    <option>Seragam Karyawan</option>
-    <option>Listrik air dan telepon</option>
-    <option>Sewa</option>
-    <option>Perlengkapan dan peralatan kantor</option>
+  <select id="kategori" class="border p-2 rounded">
+    <option>Marketing</option>
     <option>Transportasi</option>
-    <option>Paket dan ekspedisi</option>
-    <option>Perjalanan Dinas</option>
-    <option>Beban reparasi dan pemeliharaan aset tetap</option>
-    <option>Pajak dan retribusi</option>
-    <option>Relasi, customer dan VIP</option>
-    <option>Konsolidasi</option>
+    <option>Gaji</option>
     <option>Umum</option>
-    <option>Iuran</option>
-    <option>Sumbangan</option>
-    <option>CSR</option>
-    <option>Jasa konsultasi</option>
-    <option>Inovasi</option>
-    <option>Asuransi</option>
-    <option>Administrasi</option>
-    <option>Other</option>
-    <option>Pembelian Aset</option>
-    <option>Cicilan Aset</option>
-    <option>Cicilan Bank</option>
-    <option>Piutang Karyawan</option>
-    <option>Piutang Boko</option>
-    <option>Piutang Jiwa Jogja</option>
-    <option>Piutang Cafe</option>
   </select>
 
-  <input type="number" id="nominal"
-    placeholder="Nominal"
-    class="border p-2 rounded"
-    required />
+  <input type="number" id="nominal" placeholder="Nominal" required class="border p-2 rounded">
+  <input type="number" id="qty" value="1" min="1" required class="border p-2 rounded">
 
-  <input type="number" id="qty"
-    placeholder="Qty"
-    value="1"
-    min="1"
-    class="border p-2 rounded"
-    required />
-
-  <button
-    class="md:col-span-7 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded">
+  <button id="btnSubmit"
+    class="md:col-span-7 bg-blue-600 text-white p-2 rounded">
     Simpan
   </button>
 </form>
 
-<!-- TABLE -->
+<!-- FILTER + EXPORT -->
 <div class="flex gap-2 mb-4">
   <input type="month" id="filterBulan" class="border p-2 rounded">
-  <button id="btnFilter" class="bg-blue-600 text-white px-4 rounded">
-    Filter
+  <button id="btnFilter" class="bg-blue-600 text-white px-3 rounded">Filter</button>
+  <button id="btnReset" class="bg-gray-500 text-white px-3 rounded">Reset</button>
+  <button onclick="exportExcel()" class="bg-green-600 text-white px-3 rounded">
+    Excel
   </button>
-  <button id="btnReset" class="bg-gray-400 text-white px-4 rounded">
-    Reset
+  <button onclick="exportPDF()" class="bg-red-600 text-white px-3 rounded">
+    PDF
   </button>
 </div>
 
-  
+<!-- TABLE -->
 <div class="bg-white rounded shadow overflow-x-auto">
-  <table class="min-w-full text-sm">
-    <thead class="bg-gray-200">
-      <tr>
-        <th class="p-2 text-left">Tanggal</th>
-        <th class="p-2 text-left">Catatan</th>
-        <th class="p-2">Jenis</th>
-        <th class="p-2">Kategori</th>
-        <th class="p-2 text-right">Nominal</th>
-        <th class="p-2 text-right">Qty</th>
-        <th class="p-2 text-right">Total</th>
-        <th class="p-2">Aksi</th>
-      </tr>
-    </thead>
-    <tbody id="tbody"></tbody>
-  </table>
+<table class="min-w-full text-sm">
+  <thead class="bg-gray-200">
+    <tr>
+      <th>Tanggal</th>
+      <th>Catatan</th>
+      <th>Jenis</th>
+      <th>Kategori</th>
+      <th>Nominal</th>
+      <th>Qty</th>
+      <th>Total</th>
+      <th>Aksi</th>
+    </tr>
+  </thead>
+  <tbody id="tbody"></tbody>
+</table>
 </div>
+
+<!-- REKAP -->
+<div id="rekapKategori" class="bg-white p-4 mt-6 rounded shadow"></div>
 
 <script type="module">
 import {
   getTransaksi,
-  getTransaksiByBulan,
   addTransaksi,
   updateTransaksi,
-  deleteTransaksi
+  deleteTransaksi,
+  getTransaksiByBulan
 } from './js/transaksi.js';
 
 const tbody = document.getElementById('tbody');
 const pemasukanEl = document.getElementById('pemasukan');
 const pengeluaranEl = document.getElementById('pengeluaran');
 const saldoEl = document.getElementById('saldo');
-
-const filterBulan = document.getElementById('filterBulan');
-const btnFilter = document.getElementById('btnFilter');
-const btnReset = document.getElementById('btnReset');
-
-const formTransaksi = document.getElementById('formTransaksi');
+const btnSubmit = document.getElementById('btnSubmit');
 
 let editId = null;
 
-/* ===== RENDER ===== */
+/* ======================
+   LOAD & RENDER
+====================== */
+async function loadData() {
+  const { data } = await getTransaksi();
+  renderTable(data);
+  renderRekap(data);
+}
+
 function renderTable(data) {
   let pemasukan = 0;
   let pengeluaran = 0;
@@ -172,24 +135,21 @@ function renderTable(data) {
 
     tbody.innerHTML += `
       <tr class="border-t">
-        <td class="p-2">${item.tanggal}</td>
-        <td class="p-2">${item.catatan ?? ''}</td>
-        <td class="p-2 text-center">${item.jenis}</td>
-        <td class="p-2">${item.kategori}</td>
-        <td class="p-2 text-right">Rp ${item.nominal.toLocaleString()}</td>
-        <td class="p-2 text-right">${item.qty}</td>
-        <td class="p-2 text-right font-semibold">
-          Rp ${item.total.toLocaleString()}
-        </td> 
-        <td class="p-2 text-center">
+        <td>${item.tanggal}</td>
+        <td>${item.catatan ?? ''}</td>
+        <td>${item.jenis}</td>
+        <td>${item.kategori}</td>
+        <td>Rp ${item.nominal.toLocaleString()}</td>
+        <td>${item.qty}</td>
+        <td>Rp ${item.total.toLocaleString()}</td>
+        <td>
           <button onclick='edit(${JSON.stringify(item)})'
-            class="text-blue-600 hover:underline">Edit</button>
+            class="text-blue-600">Edit</button>
           |
           <button onclick="hapus('${item.id}')"
-            class="text-red-600 hover:underline">Hapus</button>
+            class="text-red-600">Hapus</button>
         </td>
-      </tr>
-    `;
+      </tr>`;
   });
 
   pemasukanEl.textContent = 'Rp ' + pemasukan.toLocaleString();
@@ -197,25 +157,33 @@ function renderTable(data) {
   saldoEl.textContent = 'Rp ' + (pemasukan - pengeluaran).toLocaleString();
 }
 
-/* ===== LOAD ===== */
-async function loadData() {
-  const { data } = await getTransaksi();
-  renderTable(data);
+/* ======================
+   REKAP PER KATEGORI
+====================== */
+function renderRekap(data) {
+  const rekap = {};
+  data.forEach(i => {
+    rekap[i.kategori] = (rekap[i.kategori] || 0) + i.total;
+  });
+
+  rekapKategori.innerHTML = '<h3 class="font-bold mb-2">Rekap per Kategori</h3>';
+  for (const k in rekap) {
+    rekapKategori.innerHTML += `
+      <div class="flex justify-between border-b">
+        <span>${k}</span>
+        <span>Rp ${rekap[k].toLocaleString()}</span>
+      </div>`;
+  }
 }
 
-/* ===== FILTER BULAN ===== */
-btnFilter.onclick = async () => {
-  if (!filterBulan.value) {
-    alert('Pilih bulan dulu');
-    return;
-  }
-  const { data } = await getTransaksiByBulan(filterBulan.value);
-  renderTable(data);
+/* ======================
+   ACTIONS
+====================== */
+window.hapus = async (id) => {
+  await deleteTransaksi(id);
+  loadData();
 };
 
-btnReset.onclick = loadData;
-
-/* ===== EDIT ===== */
 window.edit = (item) => {
   editId = item.id;
   tanggal.value = item.tanggal;
@@ -224,18 +192,9 @@ window.edit = (item) => {
   kategori.value = item.kategori;
   nominal.value = item.nominal;
   qty.value = item.qty;
-
   btnSubmit.textContent = 'Update';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-/* ===== DELETE ===== */
-window.hapus = async (id) => {
-  await deleteTransaksi(id);
-  loadData();
-};
-
-/* ===== SUBMIT ===== */
 formTransaksi.onsubmit = async (e) => {
   e.preventDefault();
 
@@ -260,18 +219,32 @@ formTransaksi.onsubmit = async (e) => {
   loadData();
 };
 
+/* ======================
+   FILTER
+====================== */
+btnFilter.onclick = async () => {
+  if (!filterBulan.value) return;
+  const { data } = await getTransaksiByBulan(filterBulan.value);
+  renderTable(data);
+  renderRekap(data);
+};
+
+btnReset.onclick = loadData;
+
+/* ======================
+   EXPORT
+====================== */
+window.exportExcel = () => {
+  const wb = XLSX.utils.table_to_book(document.querySelector('table'));
+  XLSX.writeFile(wb, 'laporan-keuangan.xlsx');
+};
+
+window.exportPDF = () => {
+  html2pdf().from(document.body).save('laporan-keuangan.pdf');
+};
+
 loadData();
 </script>
 
-
 </body>
 </html>
-
-
-
-
-
-
-
-
-
