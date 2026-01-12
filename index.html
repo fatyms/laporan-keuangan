@@ -388,7 +388,16 @@ btnFilter.onclick = async () => {
 };
 
 btnReset.onclick = loadData;
+btnReset.onclick = async () => {
+  startDate.value = '';
+  endDate.value = '';
+  infoPeriode.textContent = '';
 
+  const { data } = await getTransaksi();
+  renderTable(data);
+  renderRekap(data);
+};
+  
 /* ================= EXPORT ================= */
 window.exportExcel = () => {
   const wb = XLSX.utils.table_to_book(document.querySelector('table'));
@@ -399,11 +408,19 @@ window.exportPDF = () => {
   html2pdf().from(document.body).save('laporan-keuangan.pdf');
 };
 
+window.addEventListener('load', () => {
+  const now = new Date();
+  startDate.value = new Date(now.getFullYear(), now.getMonth(), 1)
+    .toISOString().slice(0,10);
+  endDate.value = now.toISOString().slice(0,10);
+});
+  
 loadData();
 </script>
 
 </body>
 </html>
+
 
 
 
