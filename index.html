@@ -260,24 +260,39 @@ document.getElementById('btnFilterTanggal').onclick = async () => {
   const end = document.getElementById('endDate').value;
 
   if (!start || !end) {
-    alert('Pilih rentang tanggal!');
+    alert('Harap pilih Tanggal Mulai dan Tanggal Akhir!');
     return;
   }
 
-  const { data, error } = await getTransaksiByTanggal(start, end);
-  if (error) alert('Gagal mengambil data');
-  else {
+  // Validasi: Mulai tidak boleh lebih besar dari Akhir
+  if (start > end) {
+    alert('Tanggal mulai tidak boleh melebihi tanggal akhir.');
+    return;
+  }
+  
+  try {
+    const { data, error } = await getTransaksiByTanggal(start, end);
+    if (error) throw error;
+
+    if (data.length === 0) {
+      alert('Tidak ada data pada rentang tanggal tersebut.');
+    }
+
     renderTable(data);
     renderRekap(data);
-    infoPeriode.textContent = `Menampilkan data: ${start} s/d ${end}`;
+    document.getElementById('infoPeriode').textContent = `📍 Menampilkan data: ${start} s/d ${end}`;
+  } catch (err) {
+    console.error('Filter Error:', err);
+    alert('Terjadi kesalahan saat memfilter data.');
   }
 };
 
-document.getElementById('btnReset').onclick = () => {
+// Reset Filter
+  document.getElementById('btnReset').onclick = () => {
   document.getElementById('startDate').value = '';
   document.getElementById('endDate').value = '';
-  infoPeriode.textContent = '';
-  loadData();
+  document.getElementById('infoPeriode').textContent = '';
+  loadData(); // Memanggil ulang semua data dari database
 };
 
 // Exports
@@ -304,3 +319,4 @@ window.addEventListener('load', () => {
 </script>
 </body>
 </html>
+
