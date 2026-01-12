@@ -138,23 +138,33 @@
   </table>
 </div>
 
-<!-- SCRIPT -->
 <script type="module">
-import { getTransaksi, addTransaksi, deleteTransaksi } from './js/transaksi.js';
+import {
+  getTransaksi,
+  getTransaksiByBulan,
+  addTransaksi,
+  deleteTransaksi
+} from './js/transaksi.js';
 
 const tbody = document.getElementById('tbody');
+const pemasukanEl = document.getElementById('pemasukan');
+const pengeluaranEl = document.getElementById('pengeluaran');
+const saldoEl = document.getElementById('saldo');
 
-async function loadData() {
-  const { data } = await getTransaksi();
+const filterBulan = document.getElementById('filterBulan');
+const btnFilter = document.getElementById('btnFilter');
+const btnReset = document.getElementById('btnReset');
 
+const formTransaksi = document.getElementById('formTransaksi');
+
+function renderTable(data) {
   let pemasukan = 0;
   let pengeluaran = 0;
-
   tbody.innerHTML = '';
 
   data.forEach(item => {
     if (item.jenis === 'pemasukan') pemasukan += item.total;
-    if (item.jenis === 'pengeluaran') pengeluaran += item.total;
+    else pengeluaran += item.total;
 
     tbody.innerHTML += `
       <tr class="border-t">
@@ -162,10 +172,10 @@ async function loadData() {
         <td class="p-2">${item.catatan ?? ''}</td>
         <td class="p-2 text-center">${item.jenis}</td>
         <td class="p-2">${item.kategori}</td>
-        <td class="p-2 text-right">Rp ${Number(item.nominal).toLocaleString()}</td>
+        <td class="p-2 text-right">Rp ${item.nominal.toLocaleString()}</td>
         <td class="p-2 text-right">${item.qty}</td>
         <td class="p-2 text-right font-semibold">
-          Rp ${Number(item.total).toLocaleString()}
+          Rp ${item.total.toLocaleString()}
         </td>
         <td class="p-2 text-center">
           <button onclick="hapus('${item.id}')"
@@ -182,20 +192,32 @@ async function loadData() {
   saldoEl.textContent = 'Rp ' + (pemasukan - pengeluaran).toLocaleString();
 }
 
-btnFilter.onclick = async () => {
-  if (!filterBulan.value) return;
+async function loadData() {
+  const { data } = await getTransaksi();
+  renderTable(data);
+}
+
+/* ===== FILTER BULAN ===== */
+btnFilter.addEventListener('click', async () => {
+  if (!filterBulan.value) {
+    alert('Pilih bulan terlebih dahulu');
+    return;
+  }
+
   const { data } = await getTransaksiByBulan(filterBulan.value);
   renderTable(data);
-};
+});
 
-btnReset.onclick = loadData;
-  
+btnReset.addEventListener('click', loadData);
+
+/* ===== DELETE ===== */
 window.hapus = async (id) => {
   await deleteTransaksi(id);
   loadData();
 };
 
-formTransaksi.onsubmit = async (e) => {
+/* ===== ADD TRANSAKSI ===== */
+formTransaksi.addEventListener('submit', async (e) => {
   e.preventDefault();
 
   await addTransaksi({
@@ -209,16 +231,13 @@ formTransaksi.onsubmit = async (e) => {
 
   formTransaksi.reset();
   loadData();
-};
-
-const pemasukanEl = document.getElementById('pemasukan');
-const pengeluaranEl = document.getElementById('pengeluaran');
-const saldoEl = document.getElementById('saldo');
+});
 
 loadData();
 </script>
 
 </body>
 </html>
+
 
 
