@@ -7,6 +7,15 @@ export async function getTransaksi() {
     .order('tanggal', { ascending: false });
 }
 
+export async function getTransaksiByTanggal(start, end) {
+  return await supabase
+    .from('transaksi')
+    .select('*')
+    .gte('tanggal', start)
+    .lte('tanggal', end)
+    .order('tanggal', { ascending: false });
+}
+
 export async function getTransaksiByBulan(bulan) {
   const start = `${bulan}-01`;
   const end = new Date(start);
