@@ -67,6 +67,7 @@
 <div class="flex flex-wrap gap-2 mb-4">
   <input type="month" id="filterBulan" class="border p-2 rounded" />
 
+  <!-- 
   <button id="btnFilter" class="bg-blue-600 text-white px-4 rounded">
     Filter
   </button>
@@ -74,7 +75,7 @@
   <button id="btnReset" class="bg-gray-500 text-white px-4 rounded">
     Reset
   </button>
-
+  -->
   <button onclick="exportExcel()" class="bg-green-600 text-white px-4 rounded">
     Excel
   </button>
@@ -82,6 +83,28 @@
   <button onclick="exportPDF()" class="bg-red-600 text-white px-4 rounded">
     PDF
   </button>
+  <div class="flex flex-wrap gap-2 mb-4 items-end">
+  <div>
+    <label class="text-xs text-gray-500">Dari Tanggal</label>
+    <input type="date" id="startDate" class="border p-2 rounded w-full">
+  </div>
+
+  <div>
+    <label class="text-xs text-gray-500">Sampai Tanggal</label>
+    <input type="date" id="endDate" class="border p-2 rounded w-full">
+  </div>
+
+  <button id="btnFilterTanggal"
+    class="bg-blue-600 text-white px-4 py-2 rounded">
+    Tampilkan
+  </button>
+
+  <button id="btnReset"
+    class="bg-gray-500 text-white px-4 py-2 rounded">
+    Reset
+  </button>
+</div>
+
 </div>
 
 <!-- ================= TABLE ================= -->
@@ -351,6 +374,7 @@ loadData();
 
 </body>
 </html>
+
 
 
 
