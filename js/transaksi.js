@@ -51,3 +51,46 @@ export async function getTransaksiByBulan(bulan) {
   if (error) throw error;
   return { data };
 }
+
+function renderTable(data) {
+  let pemasukan = 0;
+  let pengeluaran = 0;
+  tbody.innerHTML = '';
+
+  data.forEach(item => {
+    if (item.jenis === 'pemasukan') pemasukan += item.total;
+    else pengeluaran += item.total;
+
+    tbody.innerHTML += `
+      <tr class="border-t">
+        <td class="p-2">${item.tanggal}</td>
+        <td class="p-2">${item.catatan ?? ''}</td>
+        <td class="p-2 text-center">${item.jenis}</td>
+        <td class="p-2">${item.kategori}</td>
+        <td class="p-2 text-right">Rp ${item.nominal.toLocaleString()}</td>
+        <td class="p-2 text-right">${item.qty}</td>
+        <td class="p-2 text-right font-semibold">
+          Rp ${item.total.toLocaleString()}
+        </td>
+        <td class="p-2 text-center">
+          <button onclick="editTransaksi(${JSON.stringify(item)})"
+            class="text-blue-600">Edit</button>
+          |
+          <button onclick="hapus('${item.id}')"
+            class="text-red-600">Hapus</button>
+        </td>
+      </tr>
+    `;
+  });
+
+  pemasukanEl.textContent = 'Rp ' + pemasukan.toLocaleString();
+  pengeluaranEl.textContent = 'Rp ' + pengeluaran.toLocaleString();
+  saldoEl.textContent = 'Rp ' + (pemasukan - pengeluaran).toLocaleString();
+}
+
+async function loadData() {
+  const { data } = await getTransaksi();
+  renderTable(data);
+}
+
+
