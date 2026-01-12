@@ -263,20 +263,44 @@ formTransaksi.onsubmit = async (e) => {
     jenis: jenis.value,
     kategori: kategori.value,
     nominal: Number(nominal.value),
-    qty: Number(qty.value)
+    qty: Number(qty.value),
+    total: Number(nominal.value) * Number(qty.value)
   };
 
+  let result;
+
   if (editId) {
-    await updateTransaksi(editId, payload);
+    result = await updateTransaksi(editId, payload);
     editId = null;
     btnSubmit.textContent = 'Simpan';
   } else {
-    await addTransaksi(payload);
+    result = await addTransaksi(payload);
+  }
+
+  if (result.error) {
+    alert('Gagal menyimpan data!');
+    console.error(result.error);
+    return;
   }
 
   formTransaksi.reset();
   loadData();
 };
+
+ window.hapus = async (id) => {
+  if (!confirm('Hapus transaksi ini?')) return;
+
+  const res = await deleteTransaksi(id);
+
+  if (res.error) {
+    alert('Gagal menghapus');
+    console.error(res.error);
+    return;
+  }
+
+  loadData();
+};
+ 
 
 /* ================= FILTER ================= */
 btnFilter.onclick = async () => {
@@ -303,3 +327,4 @@ loadData();
 
 </body>
 </html>
+
