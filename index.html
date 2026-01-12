@@ -257,6 +257,10 @@ window.editTransaksi = (item) => {
 formTransaksi.onsubmit = async (e) => {
   e.preventDefault();
 
+  const nominalVal = Number(nominal.value);
+  const qtyVal = Number(qty.value);
+  const total = nominalVal * qtyVal;
+  
   const payload = {
     tanggal: tanggal.value,
     catatan: catatan.value,
@@ -282,7 +286,6 @@ formTransaksi.onsubmit = async (e) => {
   console.error('SUPABASE ERROR:', result.error);
   return;
   }
-
 
   formTransaksi.reset();
   loadData();
@@ -328,6 +331,7 @@ loadData();
 
 </body>
 </html>
+
 
 
 
