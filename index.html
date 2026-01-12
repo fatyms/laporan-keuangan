@@ -225,6 +225,7 @@ window.edit = (item) => {
   nominal.value = item.nominal;
   qty.value = item.qty;
 
+  btnSubmit.textContent = 'Update';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
@@ -250,6 +251,7 @@ formTransaksi.onsubmit = async (e) => {
   if (editId) {
     await updateTransaksi(editId, payload);
     editId = null;
+    btnSubmit.textContent = 'Simpan';
   } else {
     await addTransaksi(payload);
   }
@@ -264,6 +266,7 @@ loadData();
 
 </body>
 </html>
+
 
 
 
