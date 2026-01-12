@@ -235,6 +235,8 @@ window.edit = (item) => {
   kategori.value = item.kategori;
   nominal.value = item.nominal;
   qty.value = item.qty;
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
 /* ===== DELETE ===== */
@@ -273,6 +275,7 @@ loadData();
 
 </body>
 </html>
+
 
 
 
