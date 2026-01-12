@@ -18,3 +18,20 @@ export async function addTransaksi(data) {
 export async function deleteTransaksi(id) {
   return await supabase.from('transaksi').delete().eq('id', id);
 }
+
+export async function getTransaksiByBulan(bulan) {
+  const start = `${bulan}-01`;
+  const end = new Date(bulan + '-01');
+  end.setMonth(end.getMonth() + 1);
+
+  const { data, error } = await supabase
+    .from('transaksi')
+    .select('*')
+    .gte('tanggal', start)
+    .lt('tanggal', end.toISOString().slice(0, 10))
+    .eq('deleted_at', null)
+    .order('tanggal', { ascending: false });
+
+  if (error) throw error;
+  return { data };
+}
