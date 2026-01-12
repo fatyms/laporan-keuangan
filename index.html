@@ -166,6 +166,23 @@ const KATEGORI_LIST = [
   'Modal'
 ];
 
+const nominalInput = document.getElementById('nominal');
+const qtyInput = document.getElementById('qty');
+const totalView = document.getElementById('totalView');
+
+function hitungTotal() {
+  const nominal = Number(nominalInput.value) || 0;
+  const qty = Number(qtyInput.value) || 0;
+  const total = nominal * qty;
+
+  totalView.value = total
+    ? 'Rp ' + total.toLocaleString()
+    : '';
+}
+
+nominalInput.addEventListener('input', hitungTotal);
+qtyInput.addEventListener('input', hitungTotal);
+  
 const kategoriSelect = document.getElementById('kategori');
 function loadKategori() {
   kategoriSelect.innerHTML = '<option value="">-- Pilih Kategori --</option>';
@@ -257,6 +274,8 @@ window.editTransaksi = (item) => {
   kategori.value = item.kategori;
   nominal.value = item.nominal;
   qty.value = item.qty;
+
+  hitungTotal();
   btnSubmit.textContent = 'Update';
 };
 
@@ -336,6 +355,7 @@ loadData();
 
 </body>
 </html>
+
 
 
 
